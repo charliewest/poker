@@ -8,6 +8,7 @@ WINDOW_HEIGHT = 400
 
 NUMBER_OF_CARDS = 5
 NUMBER_OF_PLAYERS = 2
+NUMBER_OF_ROUNDS = 3
 
 class ApplicationGui(tk.Frame):
 
@@ -21,7 +22,7 @@ class ApplicationGui(tk.Frame):
                        "S": PhotoImage(file="images/spade.png"),
                        "D": PhotoImage(file="images/diamond.png"),
                        "Blank" : PhotoImage(file="images/blank.png")}
-        self.pack()
+        self.grid()
         self.create_widgets()
 
     def create_widgets(self):
@@ -88,7 +89,7 @@ class ApplicationGui(tk.Frame):
                 dropped_cards.append(button["text"])
                 button["text"] = ""
 
-        more_tries, new_cards = self.game_engine.get_new_cards(dropped_cards)
+        new_cards = self.game_engine.get_new_cards(dropped_cards)
         print(new_cards)
         for new_card in new_cards:
             for button, var in self.your_hand:
@@ -99,17 +100,17 @@ class ApplicationGui(tk.Frame):
                     button.deselect()
                     break
 
-        if not more_tries:
+        if not self.game_engine.is_game_active():
             for button, var in self.your_hand:
                 button["state"] = tk.constants.NORMAL
             self.new_cards_button["state"] = tk.constants.DISABLED
             for label in self.my_hand:
                 label["image"] = self.images[label["text"][-1]]
-            print("GAME OVER!")
+            print("\n\nGAME OVER\n\nWinning Hand: {}".format(game_engine.get_winning_hand()))
 
     def deal_cards(self):
         self.new_cards_button["state"] = tk.constants.NORMAL
-        hands = game_engine.deal_cards(NUMBER_OF_PLAYERS, NUMBER_OF_CARDS)
+        hands = game_engine.deal_cards(NUMBER_OF_PLAYERS, NUMBER_OF_CARDS, NUMBER_OF_ROUNDS)
         for button in self.my_hand:
             button["state"] = tk.constants.NORMAL
         for button, var in self.your_hand:
