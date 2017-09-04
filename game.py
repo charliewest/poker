@@ -6,18 +6,17 @@ RANKS = [2, 3, 4, 5, 6, 7, 8, 9, "T", "J", "Q", "K", "A"]
 
 class Game:
     def poker(self, hands):
-        print("Evaluating: {}".format(hands))
         scores = [(i, self.score(hand)) for i, hand in enumerate(hands)]
-        print("Scores: {}.".format(scores))
         winner = sorted(scores, key=lambda x: x[1])[-1][0]
-        print("Winner: {}".format(winner))
+        self.winner = winner
         return hands[winner]
 
     def score(self, hand):
         ranks = '23456789TJQKA'
+        #   index (value)  "<rank><suite><rank><suite>..."  r=<rank> _=<suite>  hand=["<rank><suite>", ...]
         rcounts = {ranks.find(r): ''.join(hand).count(r) for r, _ in hand}.items()
         score, ranks = zip(*sorted((cnt, rank) for rank, cnt in rcounts)[::-1])
-        if len(score) == 5:
+        if len(score) == 5: # All cards are different
             if ranks[0:2] == (12, 3):  # adjust if 5 high straight
                 ranks = (3, 2, 1, 0, -1)
             straight = ranks[0] - ranks[4] == 4
@@ -31,6 +30,7 @@ class Game:
         self.number_of_changes = 0
         self.number_of_players = 0
         self.winning_hand = []
+        self.winner = -1
         self.more_rounds = False
 
     def deal_cards(self, number_of_players, number_of_cards, number_of_rounds):
@@ -65,7 +65,6 @@ class Game:
             self.hands[player_index].append(self.deck[0])
             new_cards.append(self.deck[0])
             del self.deck[0]
-        print(self.number_of_changes)
         self.more_rounds = self.number_of_changes < self.number_of_rounds
         if not self.more_rounds:
             self.winning_hand = self.poker(self.hands)
@@ -75,7 +74,10 @@ class Game:
         return copy.deepcopy(self.hands[player_id])
 
     def get_winning_hand(self):
-        return self.winning_hand
+        return self.winner, self.winning_hand
 
     def is_game_active(self):
         return self.more_rounds
+
+    def get_all_hands(self):
+        return self.hands

@@ -1,9 +1,11 @@
 import copy
+import abc
 
 
 class AutoPlayer:
 
     def __init__(self, player_id):
+        __metaclass__ = abc.ABCMeta
         self.player_id = player_id
         self.hand = []
         self.hand_history = []
@@ -18,3 +20,7 @@ class AutoPlayer:
 
     def get_hand_history(self):
         return self.hand_history
+
+    @abc.abstractmethod
+    def get_cards_to_drop(self):
+        pass
